@@ -72,9 +72,8 @@ class GameState:
         try:
             self.players[self.tempo].append(self.get_deck_card())
         except Exception as e:
-            print(e)
-            # TODO: fix if this is the last round, otherwise raise...
-            pass
+            if len(self.players[self.tempo]) != self._cards_count:
+                raise
 
     def shift_tempo(self):
         self.tempo = (self.tempo + 1) % self._players_count
@@ -145,7 +144,8 @@ def main():
         print()
         # Action = {hint / throw / build}
         # actions = []
-        action = input('Action (t1, b1, h1n1): ')
+        # action = input('Action (t1, b1, h1n1): ')
+        print('x'*80)
         time.sleep(1)
 
 
