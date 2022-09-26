@@ -24,6 +24,7 @@ class GameState:
         5: 4,
     }
     MAX_LIGHTNINGS = 2
+    MAX_INFO_AVAILABLE = 8
 
     @classmethod
     def generate_deck(cls):
@@ -37,7 +38,7 @@ class GameState:
         self.tempo = random.randrange(players_count)
         self._cards_count = self.CARDS_COUNT[players_count]
         self.lightnings = 0
-        self.info_available = 8
+        self.info_available = self.MAX_INFO_AVAILABLE
         self.built = dict([(c, 0) for c in COLORS])
         self.garbage = []
         self.deck = GameState.generate_deck()
@@ -80,9 +81,25 @@ class GameState:
                 print(e)
                 # TODO: fix if this is the last round, otherwise raise...
                 pass
+            if card_number == 5 and self.info_available < self.MAX_INFO_AVAILABLE:
+                self.info_available += 1
         else:
             self.garbage.append((card_color, card_number))
             self.lightning()
+        self.shift_tempo()
+
+    def give_hint(self, from_player, to_player, color=None, number=None):
+        if from_player == to_player:
+            raise Exception('Can not give hint to oneself!')
+        elif not self.info_available:
+            raise Exception('No info available!')
+        elif color is not None and number is not None:
+            raise Exception('Can hint either color or number, not both!')
+        elif color is None and number is None:
+            raise Exception('Must give precisely one hint!')
+        # TODO: check with rules:
+        # Can we give info about color/number that player does not have?
+        self.info_available -= 1
         self.shift_tempo()
 
     def __str__(self):
@@ -103,6 +120,10 @@ def main():
         print(game_state)
         print()
         game_state.build(0, 0)
+        print(game_state)
+        game_state.give_hint(0, 1, 0)
+        print(game_state)
+        game_state.give_hint(0, 1, number=1)
         print(game_state)
         # Action = {hint / throw / build}
         # actions = []
