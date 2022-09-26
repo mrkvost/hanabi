@@ -71,12 +71,12 @@ class GameState:
     def shift_tempo(self):
         self.tempo = (self.tempo + 1) % self._players_count
 
-    def build(self, player, card):
-        card_color, card_number = self.get_player_card(player, card)
+    def build(self, card):
+        card_color, card_number = self.get_player_card(self.tempo, card)
         if (self.built[card_color] + 1) == card_number:
             self.built[card_color] = card_number
             try:
-                self.players[player].append(self.get_deck_card())
+                self.players[self.tempo].append(self.get_deck_card())
             except Exception as e:
                 print(e)
                 # TODO: fix if this is the last round, otherwise raise...
@@ -88,8 +88,15 @@ class GameState:
             self.lightning()
         self.shift_tempo()
 
-    def give_hint(self, from_player, to_player, color=None, number=None):
-        if from_player == to_player:
+    def throw_card(self, card):
+        card_color, card_number = self.get_player_card(self.tempo, card)
+        if self.info_available < self.MAX_INFO_AVAILABLE:
+            self.info_available += 1
+        self.garbage.append((card_color, card_number))
+        self.shift_tempo()
+
+    def give_hint(self, to_player, color=None, number=None):
+        if self.tempo == to_player:
             raise Exception('Can not give hint to oneself!')
         elif not self.info_available:
             raise Exception('No info available!')
@@ -119,11 +126,13 @@ def main():
         game_state = GameState()
         print(game_state)
         print()
-        game_state.build(0, 0)
+        game_state.build(0)
         print(game_state)
-        game_state.give_hint(0, 1, 0)
+        game_state.give_hint((game_state.tempo + 1) % 2, 0)
         print(game_state)
-        game_state.give_hint(0, 1, number=1)
+        game_state.give_hint((game_state.tempo + 1) % 2, number=1)
+        print(game_state)
+        game_state.throw_card(1)
         print(game_state)
         # Action = {hint / throw / build}
         # actions = []
