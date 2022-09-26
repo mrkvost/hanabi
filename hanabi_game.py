@@ -68,6 +68,14 @@ class GameState:
             raise Exception('Such card does not exist!')
         return self.players[player].pop(card)
 
+    def give_player_card(self):
+        try:
+            self.players[self.tempo].append(self.get_deck_card())
+        except Exception as e:
+            print(e)
+            # TODO: fix if this is the last round, otherwise raise...
+            pass
+
     def shift_tempo(self):
         self.tempo = (self.tempo + 1) % self._players_count
 
@@ -75,17 +83,12 @@ class GameState:
         card_color, card_number = self.get_player_card(self.tempo, card)
         if (self.built[card_color] + 1) == card_number:
             self.built[card_color] = card_number
-            try:
-                self.players[self.tempo].append(self.get_deck_card())
-            except Exception as e:
-                print(e)
-                # TODO: fix if this is the last round, otherwise raise...
-                pass
             if card_number == 5 and self.info_available < self.MAX_INFO_AVAILABLE:
                 self.info_available += 1
         else:
             self.garbage.append((card_color, card_number))
             self.lightning()
+        self.give_player_card()
         self.shift_tempo()
 
     def throw_card(self, card):
@@ -93,6 +96,7 @@ class GameState:
         if self.info_available < self.MAX_INFO_AVAILABLE:
             self.info_available += 1
         self.garbage.append((card_color, card_number))
+        self.give_player_card()
         self.shift_tempo()
 
     def give_hint(self, to_player, color=None, number=None):
@@ -111,7 +115,8 @@ class GameState:
 
     def __str__(self):
         return '\n - '.join([
-            f' - Deck: {self.deck}',
+            # f' - Deck: {self.deck}',
+            f' - Deck count: {len(self.deck)}',
             f'Players: {self.players}',
             f'Tempo: {self.tempo}',
             f'Garbage: {self.garbage}',
@@ -128,12 +133,16 @@ def main():
         print()
         game_state.build(0)
         print(game_state)
+        print()
         game_state.give_hint((game_state.tempo + 1) % 2, 0)
         print(game_state)
+        print()
         game_state.give_hint((game_state.tempo + 1) % 2, number=1)
         print(game_state)
+        print()
         game_state.throw_card(1)
         print(game_state)
+        print()
         # Action = {hint / throw / build}
         # actions = []
         action = input('Action (t1, b1, h1n1): ')
