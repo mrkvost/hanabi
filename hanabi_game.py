@@ -5,17 +5,24 @@ import random
 import argparse
 
 
-COLORS = {
-    0: 'red',
-    1: 'green',
-    2: 'blue',
-    3: 'while',
-    4: 'yellow',
-    5: 'rainbow',
-}
+class GameException(Exception):
+    pass
+
+
+class EndGameException(GameException):
+    pass
 
 
 class GameState:
+    COLORS = {
+        0: 'red',
+        1: 'green',
+        2: 'blue',
+        3: 'while',
+        4: 'yellow',
+        5: 'rainbow',
+    }
+
     DECK_BASE = [(c, n) for c in range(len(COLORS)) for n in (1,1,1,2,2,3,3,4,4,5)]
     CARDS_COUNT = {
         2: 5,
@@ -25,6 +32,7 @@ class GameState:
     }
     MAX_LIGHTNINGS = 2
     MAX_INFO_AVAILABLE = 8
+    MAX_POINTS = 5 * len(COLORS)
 
     @classmethod
     def generate_deck(cls):
@@ -32,18 +40,20 @@ class GameState:
 
     def __init__(self, players_count=2):
         if players_count not in self.CARDS_COUNT:
-            raise Exception('Wrong number of players!')
+            raise GameException('Wrong number of players!')
 
         self._players_count = players_count
         self.tempo = random.randrange(players_count)
         self._cards_count = self.CARDS_COUNT[players_count]
         self.lightnings = 0
+        self.game_ended = False
         self.info_available = self.MAX_INFO_AVAILABLE
-        self.built = dict([(c, 0) for c in COLORS])
+        self.built = dict([(c, 0) for c in self.COLORS])
         self.garbage = []
         self.deck = GameState.generate_deck()
         self.players = []
         self.deal_cards()
+        self.points = 0
 
     def deal_cards(self):
         for player in range(self._players_count):
@@ -54,24 +64,26 @@ class GameState:
     def lightning(self):
         self.lightnings += 1
         if self.lightnings > self.MAX_LIGHTNINGS:
-            raise Exception('Max lightnings exceeded!')
+            self.points = 0
+            self.game_ended = True
+            raise EndGameException('Max lightnings exceeded!')
 
     def get_deck_card(self):
         if not self.deck:
-            raise Exception('No more cards in the deck!')
+            raise GameException('No more cards in the deck!')
         return self.deck.pop()
 
     def get_player_card(self, player, card):
         if player >= len(self.players) or player < 0:
-            raise Exception('Such player does not exist!')
+            raise GameException('Such player does not exist!')
         elif card >= self._cards_count or card < 0:
-            raise Exception('Such card does not exist!')
+            raise GameException('Such card does not exist!')
         return self.players[player].pop(card)
 
     def give_player_card(self):
         try:
             self.players[self.tempo].append(self.get_deck_card())
-        except Exception as e:
+        except GameException as e:
             if len(self.players[self.tempo]) != self._cards_count:
                 raise
 
@@ -82,8 +94,13 @@ class GameState:
         card_color, card_number = self.get_player_card(self.tempo, card)
         if (self.built[card_color] + 1) == card_number:
             self.built[card_color] = card_number
-            if card_number == 5 and self.info_available < self.MAX_INFO_AVAILABLE:
-                self.info_available += 1
+            self.points += 1
+            if card_number == 5:
+                if self.info_available < self.MAX_INFO_AVAILABLE:
+                    self.info_available += 1
+                if self.points == self.MAX_POINTS:
+                    self.game_ended = True
+                    raise EndGameException('Max lightnings exceeded!')
         else:
             self.garbage.append((card_color, card_number))
             self.lightning()
@@ -100,13 +117,13 @@ class GameState:
 
     def give_hint(self, to_player, color=None, number=None):
         if self.tempo == to_player:
-            raise Exception('Can not give hint to oneself!')
+            raise GameException('Can not give hint to oneself!')
         elif not self.info_available:
-            raise Exception('No info available!')
+            raise GameException('No info available!')
         elif color is not None and number is not None:
-            raise Exception('Can hint either color or number, not both!')
+            raise GameException('Can hint either color or number, not both!')
         elif color is None and number is None:
-            raise Exception('Must give precisely one hint!')
+            raise GameException('Must give precisely one hint!')
         # TODO: check with rules:
         # Can we give info about color/number that player does not have?
         self.info_available -= 1
@@ -115,13 +132,15 @@ class GameState:
     def __str__(self):
         return '\n - '.join([
             # f' - Deck: {self.deck}',
-            f' - Deck count: {len(self.deck)}',
-            f'Players: {self.players}',
-            f'Tempo: {self.tempo}',
-            f'Garbage: {self.garbage}',
-            f'Built: {self.built}',
-            f'Lightnings: {self.lightnings}',
-            f'Info_available: {self.info_available}',
+            f' -     Deck count: {len(self.deck)}',
+            f'       Players: {self.players}',
+            f'         Tempo: {self.tempo}',
+            f'       Garbage: {self.garbage}',
+            f'         Built: {self.built}',
+            f'    Lightnings: {self.lightnings}',
+            f'Info Available: {self.info_available}',
+            f'    Game Ended: {self.game_ended}',
+            f'        Points: {self.points}',
         ])
 
 
@@ -129,19 +148,18 @@ def main():
     while True:
         game_state = GameState()
         print(game_state)
-        print()
-        game_state.build(0)
+        print('-'*30)
+        for i in range(4):
+            try:
+                game_state.build(0)
+            except GameException as e:
+                pass
         print(game_state)
-        print()
-        game_state.give_hint((game_state.tempo + 1) % 2, 0)
-        print(game_state)
-        print()
-        game_state.give_hint((game_state.tempo + 1) % 2, number=1)
-        print(game_state)
-        print()
-        game_state.throw_card(1)
-        print(game_state)
-        print()
+
+        # game_state.give_hint((game_state.tempo + 1) % 2, 0)
+        # game_state.give_hint((game_state.tempo + 1) % 2, number=1)
+        # game_state.throw_card(1)
+
         # Action = {hint / throw / build}
         # actions = []
         # action = input('Action (t1, b1, h1n1): ')
