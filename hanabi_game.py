@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
-import time
 import random
-import argparse
 
 
 class GameException(Exception):
@@ -135,7 +133,7 @@ class GameState:
         self.info_available -= 1
         self.shift_tempo()
 
-    def action(self, action, **kwargs): # to_player=None, card=None, color=None, number=None):
+    def action(self, action, **kwargs): # to_player=None, card=None, color=None, number=None
         actions = {
             'build': self._build,
             'throw': self._throw,
@@ -162,7 +160,9 @@ class GameState:
         ])
 
 
-def main():
+def _main():
+    # This is just for simple testing of the game state:
+    import time
     while True:
         game_state = GameState()
         print(game_state)
@@ -181,16 +181,12 @@ def main():
             except GameException as e:
                 pass
         print(game_state)
-
-        # Action = {info / throw / build}
-        # actions = []
-        # action = input('Action (t1, b1, h1n1): ')
         print('x'*80)
         time.sleep(1)
 
 
 if __name__ == '__main__':
     try:
-        main()
+        _main()
     except KeyboardInterrupt:
         print('\n... forcefully exited ...')
