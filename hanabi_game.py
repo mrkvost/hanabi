@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import random
+import json
 
 
 class GameException(Exception):
@@ -159,12 +160,26 @@ class GameState:
             f'        Points: {self.points}',
         ])
 
+    def json(self):
+        return json.dumps({
+            'deck': self.deck,
+            'players': self.players,
+            'tempo': self.tempo,
+            'garbage': self.garbage,
+            'built': self.built,
+            'lightnings': self.lightnings,
+            'info_available': self.info_available,
+            'game_ended': self.game_ended,
+            'points': self.points,
+        })
+
 
 def _main():
     # This is just for simple testing of the game state:
     import time
     while True:
         game_state = GameState()
+        # print(game_state.json())
         print(game_state)
         print('-'*30)
         for i in range(10):
