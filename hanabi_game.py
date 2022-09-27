@@ -90,7 +90,9 @@ class GameState:
     def shift_tempo(self):
         self.tempo = (self.tempo + 1) % self._players_count
 
-    def build(self, card):
+    def _build(self, card=None):
+        if card is None:
+            raise GameException('Must specify a card to build with!')
         card_color, card_number = self.get_player_card(self.tempo, card)
         if (self.built[card_color] + 1) == card_number:
             self.built[card_color] = card_number
@@ -107,7 +109,9 @@ class GameState:
         self.give_player_card()
         self.shift_tempo()
 
-    def throw_card(self, card):
+    def _throw(self, card=None):
+        if card is None:
+            raise GameException('Must specify a card to throw away!')
         card_color, card_number = self.get_player_card(self.tempo, card)
         if self.info_available < self.MAX_INFO_AVAILABLE:
             self.info_available += 1
@@ -115,19 +119,33 @@ class GameState:
         self.give_player_card()
         self.shift_tempo()
 
-    def give_hint(self, to_player, color=None, number=None):
-        if self.tempo == to_player:
-            raise GameException('Can not give hint to oneself!')
+    def _info(self, to_player=None, color=None, number=None):
+        if to_player is None:
+            raise GameException('Must specify a player receiving info!')
+        elif self.tempo == to_player:
+            raise GameException('Can not give info to oneself!')
         elif not self.info_available:
             raise GameException('No info available!')
         elif color is not None and number is not None:
-            raise GameException('Can hint either color or number, not both!')
+            raise GameException('Can info either color or number, not both!')
         elif color is None and number is None:
-            raise GameException('Must give precisely one hint!')
+            raise GameException('Must give precisely one info!')
         # TODO: check with rules:
         # Can we give info about color/number that player does not have?
         self.info_available -= 1
         self.shift_tempo()
+
+    def action(self, action, **kwargs): # to_player=None, card=None, color=None, number=None):
+        actions = {
+            'build': self._build,
+            'throw': self._throw,
+            'info': self._info,
+        }
+        if self.game_ended:
+            raise EndGameException(f'Game Ended! (Points: {self.points})')
+        elif action not in actions:
+            raise GameException(f'Unknown action: \'{action}\'!')
+        actions[action](**kwargs)
 
     def __str__(self):
         return '\n - '.join([
@@ -149,18 +167,22 @@ def main():
         game_state = GameState()
         print(game_state)
         print('-'*30)
-        for i in range(4):
+        for i in range(10):
+            rnd = random.randint(0, 10)
             try:
-                game_state.build(0)
+                if rnd < 3:
+                    game_state.action('info', to_player=((game_state.tempo + 1) % 2), color=0)
+                elif rnd < 5:
+                    game_state.action('throw', card=0)
+                else:
+                    game_state.action('build', card=0)
+            except EndGameException as e:
+                break
             except GameException as e:
                 pass
         print(game_state)
 
-        # game_state.give_hint((game_state.tempo + 1) % 2, 0)
-        # game_state.give_hint((game_state.tempo + 1) % 2, number=1)
-        # game_state.throw_card(1)
-
-        # Action = {hint / throw / build}
+        # Action = {info / throw / build}
         # actions = []
         # action = input('Action (t1, b1, h1n1): ')
         print('x'*80)
