@@ -17,7 +17,7 @@ class GameState:
         0: 'red',
         1: 'green',
         2: 'blue',
-        3: 'while',
+        3: 'white',
         4: 'yellow',
         5: 'rainbow',
     }
