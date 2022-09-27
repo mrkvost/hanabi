@@ -7,9 +7,7 @@ import re
 from game_core import GameState, GameException, EndGameException
 
 
-# game creation for x players input
 # player view
-# player actions input
 # info of non rainbow color has to include rainbow colors
 # action history (visible?) (undo move possible?)
 
