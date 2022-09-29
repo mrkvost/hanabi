@@ -160,8 +160,8 @@ class GameState:
             f'        Points: {self.points}',
         ])
 
-    def json(self):
-        return json.dumps({
+    def as_dict(self):
+        return {
             'deck': self.deck,
             'players': self.players,
             'tempo': self.tempo,
@@ -171,7 +171,10 @@ class GameState:
             'info_available': self.info_available,
             'game_ended': self.game_ended,
             'points': self.points,
-        })
+        }
+
+    def json(self):
+        return json.dumps(self.as_dict())
 
 
 def _main():
