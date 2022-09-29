@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify
-from game_core import GameState
+from hanabi.game_core import GameState
 
 
 api_app = Blueprint('api', __name__)

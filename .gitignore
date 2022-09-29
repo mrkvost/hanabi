@@ -6,3 +6,6 @@
 
 # Virtualenv
 e/**
+
+# Session files
+.session_files/**

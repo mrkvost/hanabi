@@ -14,5 +14,5 @@ python3 -m venv e
 . e/bin/activate
 pip install -U pip
 pip install flask
-./application.py 3
+./application.py    # or: flask --app application run
 ```
