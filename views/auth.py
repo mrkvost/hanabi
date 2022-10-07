@@ -33,9 +33,6 @@ class LoginForm(FlaskForm):
 
     def __init__(self, *args, **kwargs):
         kwargs['csrf_enabled'] = False
-        print('x'*80)
-        print(kwargs)
-        print('x'*80)
         super(LoginForm, self).__init__(*args, **kwargs)
 
 
@@ -75,7 +72,7 @@ def login():
 @login_required
 def logout():
     logout_user()
-    return redirect(somewhere)
+    return redirect(url_for('auth.login'))
 
 
 # @login_manager.request_loader
