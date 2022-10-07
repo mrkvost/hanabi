@@ -1,3 +1,5 @@
 SESSION_TYPE = 'filesystem'
 SESSION_FILE_DIR = '.session_files'
 SESSION_FILE_THRESHOLD = 200
+
+SECRET_KEY = FIXME!
