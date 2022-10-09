@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint, render_template
 from flask_login import login_required
 
 
@@ -7,16 +7,11 @@ base_app = Blueprint('base', __name__)
 
 @base_app.route("/")
 @login_required
-def root():
-    return (
-        '<p>'
-            'TODOs:'
-            '<br/>- main view'
-            '<br/>- login / auth of some kind'
-            '<br/>- game start'
-            '<br/>- join game'
-            '<br/>- game save'
-            '<br/>- session'
-            '<br/>- dockerfile and uwsgi'
-        '</p>'
-    )
+def index():
+    return render_template('index.html')
+
+
+@base_app.route("/game")
+@login_required
+def game():
+    return render_template('game.html')

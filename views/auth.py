@@ -63,7 +63,7 @@ def login():
         if not is_safe_url(next_):
             return abort(400)
 
-        return redirect(next_ or url_for('base.root'))
+        return redirect(next_ or url_for('base.index'))
     return render_template('login.html', form=form)
 
 

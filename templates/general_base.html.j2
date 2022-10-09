@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+{%- block head %}
+  <title>{% block title %}Hanabi{% endblock %}</title>
+  <link rel="shortcut icon" href="{{ url_for('static', filename='fireworks.png') }}">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: rgb(50, 50, 50);
+      line-height: 38px;
+      width: 100%;
+    }
+  </style>
+{% endblock -%}
+</head>
+<body>
+  {%- block header %}
+  <header>
+    {%- block navigation %}{% endblock -%}
+  </header>
+  {% endblock -%}
+
+  <div class="content">
+    {%- block content %}{% endblock -%}
+  </div>
+</body>
+</html>

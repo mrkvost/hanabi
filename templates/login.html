@@ -1,13 +1,59 @@
+{% extends "general_base.html.j2" %}
+
 {%- from 'macros.html.j2' import render_field -%}
 
 
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Hanabi</title>
-  <link rel="shortcut icon" href="{{ url_for('static', filename='fireworks.png') }}">
-</head>
-<body class="login-page">
+{%- block title %}{{ super() }} - login{% endblock -%}
+
+
+{%- block head %}
+  {{ super() }}
+  <style>
+    div.content {
+      display: flex;
+      align-items: center;
+      /* justify-content: center; */
+    }
+    form {
+      margin: auto;
+      width: 300px;
+      min-height: 230px;
+      /* height: 200px; */
+    }
+    dl {
+      margin-block-start: 0;
+      margin-block-end: 0;
+      padding: 0;
+    }
+    dd {
+      margin-inline-start: 0;
+      padding: 0px;
+    }
+    dt {
+      font-weight: bold;
+      font-size: 20px;
+      padding: 3px 0px;
+    }
+    input[type="text"], input[type="password"] {
+      font-size: 20px;
+      padding: 5px 10px;
+      line-height: 28px;
+      min-height: 28px;
+    }
+    input[type="submit"] {
+      font-size: 20px;
+      padding: 5px 10px;
+      background-color: rgb(100, 180, 250);
+    }
+
+  </style>
+{% endblock -%}
+
+
+{%- block navigation %}{% endblock -%}
+
+
+{% block content %}
   {% for error in form.errors -%}
     <div class="error">{{ error }}</div>
   {% endfor -%}
@@ -16,7 +62,6 @@
       {{ render_field(form.username) }}
       {{ render_field(form.password) }}
     </dl>
-    <p><input type=submit value=Login>
+    <p><input type="submit" value="Login">
   </form>
-</body>
-</html>
+{% endblock %}
