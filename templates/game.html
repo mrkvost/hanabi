@@ -1,2 +1,32 @@
 {% extends "loggedin_base.html" %}
 
+
+{%- block head %}
+  {{ super() }}
+  <style>
+    header > nav > ul {
+      list-style-type: none;
+      margin-block-start: 0;
+      margin-block-end: 0;
+    }
+    header > nav > ul > li {
+      display: inline;
+      font-size: 18px;
+      font-weight: bold;
+      padding: 5px 9px;
+      background-color: rgb(120, 220, 120);
+      margin-right: 5px;
+    }
+    header > nav > ul > li > a {
+      text-decoration: none;
+      color: black;
+    }
+    header > nav > ul > li > a:link {
+      color: inherit;
+    }
+  </style>
+{% endblock -%}
+
+
+{%- block content %}
+{% endblock -%}

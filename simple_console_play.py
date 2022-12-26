@@ -4,7 +4,7 @@ import argparse
 import time
 import re
 
-from game_core import GameState, GameException, EndGameException
+from game.core import GameState, GameException, EndGameException
 
 
 # player view

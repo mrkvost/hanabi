@@ -15,6 +15,7 @@ from flask_login import LoginManager
 from http import HTTPStatus
 
 import sys
+import os
 from os.path import abspath, dirname
 
 # To be able to import when using running: './application.py'
@@ -29,10 +30,12 @@ from hanabi.models import User
 
 app = Flask(__name__)
 
+# app.config.from_prefixed_env(prefix='HANABI')
+app.config.from_object('hanabi.settings')
+
 app.register_blueprint(base_app, url_prefix='')
 app.register_blueprint(api_app, url_prefix='/api')
 app.register_blueprint(auth_app, url_prefix='/auth')
-app.config.from_object('hanabi.settings')
 
 session_ = Session()
 session_.init_app(app)
@@ -66,5 +69,9 @@ def unauthorized():
 #     return None
 
 
-if __name__ == '__main__':
+def run():
     app.run(host='0.0.0.0', port=5000, debug=True)
+
+
+if __name__ == '__main__':
+    run()

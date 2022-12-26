@@ -5,7 +5,7 @@ This is my attempt on creating hanabi game.
 # How to
 Run it (for three players) with full view in console:
 ```bash
-./console_game_play.py 3
+./simple_console_game_play.py 3
 ```
 
 Web version running locally for development:
